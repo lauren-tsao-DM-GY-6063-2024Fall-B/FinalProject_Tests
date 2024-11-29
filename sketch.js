@@ -1,35 +1,43 @@
-let num = 30; // Number of points for the Superformula
+ // number of points for the Superformula
+ // smaller value =  more angular or polygonal shape with fewer points, larger value = smoother and more continuous the shape will look
+ // kinda like 3D polygons (more polygons, finer details)
+let numPoints = 30;
+
 let strokeColor = 255;
 let x, y, z;
 
-// Radial distance
-let r = 10;
+// radius = determines the local distance of each point on the shape from the center
+// uScale affects the r (increasing uScale will lead to a larger shape)
+let r = 5;
 
-// Controls how finely the points around the shape are sampled
-let step = 0.1;
+// spacing between the points around the shape (i.e angular distance between each point)
+// smaller value = points are closer together, larger value = points are further apart
+let angleStep = 0.1;
 
-// This is the angle variable that determines the points around the circle (polar coordinates).
-let th = 0;
+// determines the points around the circle (polar coordinates).
+// (i.e. angle used to generate the points around the shape)
+let currentAngle = 0;
 
-// Controls the "sharpness" or symmetry of the shape
-// larger the value = more complex shapes with more symmetry points (e.g. stars)
-let m = 1;
+// controls the pointiness, symmetry and overall structure of the shape (i.e how many lobes the shape will have)
+// useful for creating stars and flowers
+// smaller value = more gentle, higher value = more spiky
+let spikeFactor = 1;
 
-// Exponents that affect the shape’s complexity and curvature
-let n1 = -1; //controls the sharpness of the overall shape (lower values give sharper edges).
-let n2 = 0; // n2 and n3 affect the curvature of the shape, giving it a more lopsided or curvy look depending on their values.
-let n3 = 0;
+// exponents (powers) that affect the shape’s complexity and curvature
+let sharpControl = -1; // controls the sharpness of the overall shape (lower values = sharper edges, higher values = rounder edges)
+let xControl = 0; // xControl and yControl controls x/y values that distort the the curvature of the shape, giving it a more lopsided or curvy look depending on their values
+let yControl = 0;
 
-// Overall scaling factors
-let epi = 200; // Controls overall size of the shape. 
-let a = 1; // x direction
-let b = 1;  // y direction
+// overall scaling factors
+let uScale = 200; // controls the uniform scaling of the shape 
+let xScale = 1; // x direction
+let yScale = 1;  // y direction
 
 let currentMouseX, currentMouseY;
 
-// Opacity values for fading
-let fadeAlpha = 5; // Initial opacity of the background
-let fadeSpeed = 0.05; // Speed of the fading effect
+// opacity values for fading
+let fadeAlpha = 5; // initial opacity of the background (make sure this value is the same as the mousePressed restart)
+let fadeSpeed = 0.05; // speed of the fading effect
 
 function setup() {
   createCanvas(windowWidth, windowHeight);
@@ -52,21 +60,26 @@ function draw() {
     stroke(strokeColor, 35); // (color, alpha value)
 
     beginShape();
-    for (let i = 1; i < num; i++) {
-      r = epi * pow(((pow(abs(cos(m * th / 4) / a), n2)) + (pow(abs(sin(m * th / 4) / b), n3))), (-1 / n1)); // Superformula formula
-      th = th + step;
-      x = r * cos(th);
-      y = r * sin(th);
+    // LEGEND:
+    // abs = the absolute value. Ensures that the result inside the parentheses is always positive, preventing negative distances that would distort the shape
+    // cos(m * th / 4) and sin(m * th / 4) = create the shape in polar coordinates, with the factor of m affecting the symmetry
+    // pow() = a function that raises a number to a specific power (helps define the sharpness, symmetry, and distortion of the shape in this case)
+    // (e.g. pow(abs(cos(spikeFactor * angleStep / 4) / xScale), xControl) = pow() is used to raise the value of the cosine function (scaled by spikeFactor and xScale) to the power of xControl)
+    for (let i = 1; i < numPoints; i++) {
+      r = uScale * pow(((pow(abs(cos(spikeFactor * currentAngle / 4) / xScale), xControl)) + (pow(abs(sin(spikeFactor * currentAngle / 4) / yScale), yControl))), (-1 / sharpControl)); // Superformula formula
+      currentAngle = currentAngle + angleStep;
+      x = r * cos(currentAngle);
+      y = r * sin(currentAngle);
       curveVertex(x, y);
     }
     endShape();
   } else {
-    // If the mouse is not pressed, make the background fade out gradually
+    // if the mouse is not pressed, make the background fade out gradually
     if (fadeAlpha > 0) {
-      fadeAlpha -= fadeSpeed; // Decrease opacity gradually
-      fadeAlpha = max(fadeAlpha, 0); // Prevent negative opacity
+      fadeAlpha -= fadeSpeed; // decrease opacity gradually
+      fadeAlpha = max(fadeAlpha, 0); // prevent negative opacity
     }
-    // Keep fading the background even after the mouse is released
+    // keep fading the background even after the mouse is released
     fill(0, fadeAlpha);
     noStroke();
     rect(0, 0, width, height);
@@ -74,20 +87,20 @@ function draw() {
 }
 
 function mousePressed() {
-  // Randomize the parameters to generate a new shape
-  m = int(random(30, 40)); // Increasing = more complex star-like shapes. Lowering = simpler, circular or polygonal shapes
-  n1 = random(20); // Lowering = sharper edges
-  n2 = random(6); // adjust n2 and n3 to adjust form, (e.g. one side longer or curvier than the other)
-  n3 = random(6);
-  epi = random(100, 200); // Range of randomized uniform sizes
-  step = random(8, 10); // Different levels of smoothness of shapes
+  // randomizing parameters to generate a new shape everytime the ouse is pressed
+  spikeFactor = int(random(30, 40)); // increasing = more complex star-like shapes. Lowering = simpler, circular or polygonal shapes
+  sharpControl = random(20); // Lowering = sharper edges
+  xControl = random(6); // adjust n2 and n3 to adjust form, (e.g. one side longer or curvier than the other)
+  yControl = random(6);
+  uScale = random(100, 200); // range of randomized uniform sizes
+  angleStep = random(8, 10); // different levels of smoothness of shapes
   
-  // Store the new mouse position where the shape should start from
+  // store the new mouse position where the shape should start from
   currentMouseX = mouseX;
   currentMouseY = mouseY;
 }
 
 function mouseReleased() {
-  // Optionally, reset the fade to make it start from full opacity when the mouse is pressed again
-  fadeAlpha = 5; // Reset the alpha when mouse is released
+   // reset to initial fadeAlpha value mentioned earlier when mouse is released, so that when it is pressed again it is at this value
+  fadeAlpha = 5;
 }
