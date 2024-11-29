@@ -12,7 +12,7 @@ let r = 10;
 
 // spacing between the points around the shape (i.e angular distance between each point)
 // smaller value = points are closer together, larger value = points are further apart
-let angleStep = 0.1;
+let angleStep = 20;
 
 // determines the points around the circle (polar coordinates).
 // (i.e. angle used to generate the points around the shape)
@@ -35,10 +35,6 @@ let yScale = 1;  // y direction
 
 let currentMouseX, currentMouseY;
 
-// opacity values for fading
-let fadeAlpha = 5; // initial opacity of the background (make sure this value is the same as the mousePressed restart)
-let fadeSpeed = 0.05; // speed of the fading effect
-
 function setup() {
   createCanvas(windowWidth, windowHeight);
   background(0);
@@ -48,9 +44,9 @@ function setup() {
 }
 
 function draw() {
-  // Only draw the shape if the mouse is pressed
+  // only draw the shape if the mouse is pressed
   if (mouseIsPressed) { 
-    // Draw the shape at the mouse position, which evolves over time
+    // draw the shape at the mouse position, which evolves over time as the mouse is pressed
     translate(currentMouseX, currentMouseY);
     stroke(0, random(0, 200), random(255), 35); // (color, alpha value)
     strokeWeight(2)
@@ -58,7 +54,7 @@ function draw() {
     beginShape();
     // LEGEND:
     // abs = the absolute value. Ensures that the result inside the parentheses is always positive, preventing negative distances that would distort the shape
-    // cos(m * th / 4) and sin(m * th / 4) = create the shape in polar coordinates, with the factor of m affecting the symmetry
+    // cos(spikeFactor * currentAngle / 4) and sin(spikeFactor * currentAngle / 4) = create the shape in polar coordinates, with spikeFactor affecting the symmetry
     // pow() = a function that raises a number to a specific power (helps define the sharpness, symmetry, and distortion of the shape in this case)
     // (e.g. pow(abs(cos(spikeFactor * angleStep / 4) / xScale), xControl) = pow() is used to raise the value of the cosine function (scaled by spikeFactor and xScale) to the power of xControl)
     for (let i = 1; i < numPoints; i++) {
@@ -69,25 +65,15 @@ function draw() {
       curveVertex(x, y);
     }
     endShape();
-  } else {
-    // if the mouse is not pressed, make the background fade out gradually
-    if (fadeAlpha > 0) {
-      fadeAlpha -= fadeSpeed; // decrease opacity gradually
-      fadeAlpha = max(fadeAlpha, 0); // prevent negative opacity
-    }
-    // keep fading the background even after the mouse is released
-    fill(0, fadeAlpha);
-    noStroke();
-    rect(0, 0, width, height);
-  }
+  } 
 }
 
 function mousePressed() {
   // randomizing parameters to generate a new shape everytime the ouse is pressed
   // int() = a function used to convert (through rounding down) a number into a integer (i.e. whole number) (e.g. int(32.7) = 32)
   spikeFactor = int(random(30, 40)); // smaller value = simpler, circular or polygonal shapes, larger value = more complex star-like shapes.
-  sharpControl = random(20); // Lowering = sharper edges
-  xControl = random(2); // adjust n2 and n3 to adjust form, (e.g. one side longer or curvier than the other)
+  sharpControl = random(20); // lowering = sharper edges
+  xControl = random(100); // adjust xControl and yControl to adjust form, (e.g. one side longer or curvier than the other)
   yControl = random(6);
   uScale = random(100, 200); // range of randomized uniform sizes
   angleStep = random(8, 10); // different levels of smoothness of shapes
