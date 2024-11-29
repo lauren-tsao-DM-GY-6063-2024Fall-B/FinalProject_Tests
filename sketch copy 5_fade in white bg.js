@@ -49,7 +49,12 @@ function setup() {
 
 function draw() {
   // Only draw the shape if the mouse is pressed
-  if (mouseIsPressed) { 
+  if (mouseIsPressed) {
+    // Draw a semi-transparent background, but with more opacity (less fading)
+    fill(200, fadeAlpha); // Set the background's opacity to fade
+    noStroke();
+    rect(0, 0, width, height); // Creates a semi-transparent background effect
+    
     // Draw the shape at the mouse position, which evolves over time
     translate(currentMouseX, currentMouseY);
     stroke(0, random(0, 200), random(255), 35); // (color, alpha value)
@@ -84,10 +89,9 @@ function draw() {
 
 function mousePressed() {
   // randomizing parameters to generate a new shape everytime the ouse is pressed
-  // int() = a function used to convert (through rounding down) a number into a integer (i.e. whole number) (e.g. int(32.7) = 32)
-  spikeFactor = int(random(30, 40)); // smaller value = simpler, circular or polygonal shapes, larger value = more complex star-like shapes.
+  spikeFactor = int(random(30, 40)); // increasing = more complex star-like shapes. Lowering = simpler, circular or polygonal shapes
   sharpControl = random(20); // Lowering = sharper edges
-  xControl = random(2); // adjust n2 and n3 to adjust form, (e.g. one side longer or curvier than the other)
+  xControl = random(6); // adjust n2 and n3 to adjust form, (e.g. one side longer or curvier than the other)
   yControl = random(6);
   uScale = random(100, 200); // range of randomized uniform sizes
   angleStep = random(8, 10); // different levels of smoothness of shapes
@@ -98,4 +102,6 @@ function mousePressed() {
 }
 
 function mouseReleased() {
+   // reset to initial fadeAlpha value mentioned earlier when mouse is released, so that when it is pressed again it is at this value
+  fadeAlpha = 5;
 }
