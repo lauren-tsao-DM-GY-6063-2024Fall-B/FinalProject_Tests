@@ -1,4 +1,4 @@
-let num = 60; // Number of points for the Superformula
+let num = 60;
 let colorL = 255;
 let x, y, z;
 let r, th = 0, step = 0.1, epi = 200;
