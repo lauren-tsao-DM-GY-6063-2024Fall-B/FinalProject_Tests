@@ -1,47 +1,51 @@
-let num = 60;
-let colorL = 255;
+let numPoints = 60;
+let strokeColor = 0;
 let x, y, z;
-let r, th = 0, step = 0.1, epi = 200;
-let m = 1, n1 = -1, n2 = 0, n3 = 0;
-let b = 1, a = 1; 
+let r, currentAngle = 0;
+let angleStep = 0.1;
+let uScale = 200;
+let spikeFactor = 1;
+let sharpControl = -1;
+let xControl = 0
+let yControl = 0;
+let xScale = 1;
+let yScale = 1;
 let randomX, randomY;
 
 function setup() {
   createCanvas(windowWidth, windowHeight);
-  background(50);
-  noFill();
+  background(255);
+  fill(255);
 }
 
 function draw() {
-  fill(20, 5);
-  rect(0, 0, width, height); // Fits within canvas
+  // only draw when random x and y positions have been set
+  // undefined = declare a variable but no value is assigned to it
+  if (randomX !== undefined && randomY !== undefined) { // if randomX and random Y is not equal to undefined (i.e defined)..
+    translate(randomX, randomY);  // .. move origin point to random position and draw the shape
 
-  // Only draw if randomX and randomY have been set
-  if (randomX !== undefined && randomY !== undefined) {
-    translate(randomX, randomY);  // Move origin to random position
-
-    stroke(colorL, 35);
+    stroke(strokeColor, 35);
     beginShape();
-    for (let i = 1; i < num; i++) {
-      r = epi * pow(((pow(abs(cos(m * th / 4) / a), n2)) + (pow(abs(sin(m * th / 4) / b), n3))), (-1 / n1));  
-      th = th + step;
-      x = r * cos(th);
-      y = r * sin(th);
+    for (let i = 1; i < numPoints; i++) {
+      r = uScale * pow(((pow(abs(cos(spikeFactor * currentAngle / 4) / xScale), xControl)) + (pow(abs(sin(spikeFactor * currentAngle / 4) / yScale), yControl))), (-1 / sharpControl)); // Superformula formula
+      currentAngle = currentAngle + angleStep;
+      x = r * cos(currentAngle);
+      y = r * sin(currentAngle);
       curveVertex(x, y);
     }
     endShape();
-  }
+  } 
 
-  // If the mouse is pressed, update the parameters and start drawing the shape
+  // if the mouse is pressed, randomX and randomY values will be defined, allowing the shape to be drawn
   if (mouseIsPressed) {
-    randomX = random(width);  // Random x position within canvas width
-    randomY = random(height); // Random y position within canvas height
+    randomX = random(width);  
+    randomY = random(height); 
     
-    // Reset random shape parameters
-    m = int(random(3, 40));     // Random multiplier for the formula
-    n1 = random(0.5);           // Random value for n1
-    n2 = random(6);             // Random value for n2
-    epi = random(100, 200);     // Random eccentricity
-    step = random(0.05, 10);    // Random step for the angle increment
+    // draw shape following these randomized parameters
+    spikeFactor = int(random(3, 40)); 
+    sharpControl = random(0.5);
+    xControl = random(6); 
+    uScale = random(100, 200);
+    angleStep = random(0.05, 10);
   }
 }

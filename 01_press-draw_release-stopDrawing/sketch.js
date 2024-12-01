@@ -3,7 +3,6 @@
  // kinda like 3D polygons (more polygons, finer details)
 let numPoints = 5;
 
-let strokeColor = 255;
 let x, y, z;
 
 // radius = determines the local distance of each point on the shape from the center
@@ -37,8 +36,7 @@ let currentMouseX, currentMouseY;
 
 function setup() {
   createCanvas(windowWidth, windowHeight);
-  background(0);
-  noFill();
+  background(255);
   currentMouseX = mouseX;
   currentMouseY = mouseY;
 }
@@ -84,4 +82,10 @@ function mousePressed() {
 }
 
 function mouseReleased() {
+}
+
+function keyPressed() {
+  if (key === ' ' || keyCode === 32) { // 32 is the key code for the spacebar in JavaScript
+    clear();  // clears the canvas when spacebar is pressed
+  }
 }
